@@ -2,18 +2,38 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>ConectaTEA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConectaTEA EPT</title>
+
+<style>
+body{margin:0;font-family:'Segoe UI';background:#eef3f8}
+.app{max-width:390px;margin:auto;background:white;min-height:100vh}
+.header{background:linear-gradient(135deg,#4facfe,#43e97b);color:white;padding:20px;border-radius:0 0 20px 20px}
+.content{padding:20px}
+.btn{width:100%;padding:15px;margin:8px 0;border:none;border-radius:12px;font-size:16px}
+.aluno{background:#4facfe;color:white}
+.docente{background:#43e97b;color:white}
+.card{background:white;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
+</style>
 </head>
 
 <body>
 
+<div class="app" id="app">
+
+<div class="header">
 <h2>ConectaTEA</h2>
+<p>Inclusão para estudantes e docentes</p>
+</div>
 
-<button onclick="login()">Login com Google</button>
-<button onclick="docente()">Sou Docente</button>
-<button onclick="aluno()">Sou Aluno</button>
+<div class="content">
+<button class="btn aluno" id="alunoBtn">👩‍🎓 Estudante</button>
+<button class="btn docente" id="docenteBtn">👨‍🏫 Docente</button>
+<button class="btn" id="loginBtn">🔐 Login com Google</button>
+</div>
 
-<div id="app"></div>
+</div>
 
 <script type="module">
 
@@ -21,11 +41,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 COLE SUA CONFIG AQUI
+// 🔥 SUA CONFIG CORRETA (JÁ AJUSTADA)
 const firebaseConfig = {
-  apiKey: "COLE_AQUI",
+  apiKey: "AIzaSyDvbVGsUKt-gTNiD6l2Bo6z2pbkxAcl9zc",
   authDomain: "conectatea-bbd60.firebaseapp.com",
-  projectId: "conectatea-bbd60"
+  projectId: "conectatea-bbd60",
+  storageBucket: "conectatea-bbd60.firebasestorage.app",
+  messagingSenderId: "617006702777",
+  appId: "1:617006702777:web:7814d34b232520d2087b68"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -33,47 +56,66 @@ const auth = getAuth();
 const db = getFirestore();
 
 // LOGIN
-window.login = async function(){
+document.getElementById("loginBtn").onclick = async () => {
   const provider = new GoogleAuthProvider();
   await signInWithPopup(auth, provider);
-  alert("Login realizado!");
-}
+  alert("Login realizado com sucesso!");
+};
 
 // DOCENTE
-window.docente = function(){
-document.getElementById("app").innerHTML = `
-<h3>Poste sua aula</h3>
-<input id="aula">
-<button onclick="postar()">Postar</button>
-<div id="lista"></div>
-`;
-carregar();
-}
+document.getElementById("docenteBtn").onclick = () => {
+  document.getElementById("app").innerHTML = `
+    <div class="header"><h2>Área do Docente</h2></div>
+    <div class="content">
+      <div class="card">
+        <h3>📤 Poste sua aula</h3>
+        <input id="texto" placeholder="Digite sua aula...">
+        <button class="btn docente" id="postarBtn">Publicar</button>
+      </div>
 
-// POSTAR
-window.postar = async function(){
-let texto = document.getElementById("aula").value;
-await addDoc(collection(db, "aulas"), {texto});
-}
+      <div class="card">
+        <h3>📚 Aulas publicadas</h3>
+        <div id="lista"></div>
+      </div>
+
+      <button class="btn" onclick="location.reload()">Voltar</button>
+    </div>
+  `;
+
+  document.getElementById("postarBtn").onclick = async () => {
+    let texto = document.getElementById("texto").value;
+    if(texto.trim() === "") return;
+    await addDoc(collection(db, "aulas"), { texto });
+    document.getElementById("texto").value = "";
+  };
+
+  carregar();
+};
 
 // ALUNO
-window.aluno = function(){
-document.getElementById("app").innerHTML = `
-<h3>Aulas disponíveis</h3>
-<div id="lista"></div>
-`;
-carregar();
-}
+document.getElementById("alunoBtn").onclick = () => {
+  document.getElementById("app").innerHTML = `
+    <div class="header"><h2>Área do Estudante</h2></div>
+    <div class="content">
+      <div class="card">
+        <h3>📖 Aulas disponíveis</h3>
+        <div id="lista"></div>
+      </div>
+      <button class="btn" onclick="location.reload()">Voltar</button>
+    </div>
+  `;
+  carregar();
+};
 
-// CARREGAR
-window.carregar = function(){
-onSnapshot(collection(db, "aulas"), (snapshot)=>{
-let html="";
-snapshot.forEach(doc=>{
-html += "<p>"+doc.data().texto+"</p>";
-});
-document.getElementById("lista").innerHTML = html;
-});
+// CARREGAR AULAS
+function carregar(){
+  onSnapshot(collection(db, "aulas"), (snapshot)=>{
+    let html="";
+    snapshot.forEach(doc=>{
+      html += "<div class='card'>"+doc.data().texto+"</div>";
+    });
+    document.getElementById("lista").innerHTML = html;
+  });
 }
 
 </script>
