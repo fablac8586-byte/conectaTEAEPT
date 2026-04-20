@@ -7,14 +7,17 @@
 
 <style>
 body{margin:0;font-family:'Segoe UI';background:#eef3f8}
-.app{max-width:390px;margin:auto;background:white;min-height:100vh}
-.header{background:linear-gradient(135deg,#4facfe,#43e97b);color:white;padding:20px;border-radius:0 0 20px 20px}
+.app{max-width:420px;margin:auto;background:white;min-height:100vh}
+.header{background:linear-gradient(135deg,#5f9cff,#5fd4a3);color:white;padding:20px;border-radius:0 0 20px 20px}
 .content{padding:20px}
-.btn{width:100%;padding:15px;margin:8px 0;border:none;border-radius:12px;font-size:16px}
-.aluno{background:#4facfe;color:white}
-.docente{background:#43e97b;color:white}
-.card{background:white;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
-input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
+.btn{width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;font-size:15px;cursor:pointer}
+.aluno{background:#5f9cff;color:white}
+.docente{background:#5fd4a3;color:white}
+.card{background:white;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin-bottom:8px}
+.check{cursor:pointer;padding:5px;border-radius:8px}
+.check.done{background:#d4f8e8;text-decoration:line-through}
+.small{font-size:13px;color:#555}
 </style>
 </head>
 
@@ -24,13 +27,12 @@ input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
 
 <div class="header">
 <h2>ConectaTEA</h2>
-<p>Inclusão para estudantes e docentes</p>
+<p>Aprendizagem inclusiva e estruturada</p>
 </div>
 
 <div class="content">
-<button class="btn aluno" id="alunoBtn">👩‍🎓 Estudante</button>
-<button class="btn docente" id="docenteBtn">👨‍🏫 Docente</button>
-<button class="btn" id="loginBtn">🔐 Login com Google</button>
+<button class="btn aluno" onclick="login('aluno')">👩‍🎓 Estudante</button>
+<button class="btn docente" onclick="login('docente')">👨‍🏫 Docente</button>
 </div>
 
 </div>
@@ -39,83 +41,156 @@ input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 SUA CONFIG CORRETA (JÁ AJUSTADA)
 const firebaseConfig = {
   apiKey: "AIzaSyDvbVGsUKt-gTNiD6l2Bo6z2pbkxAcl9zc",
   authDomain: "conectatea-bbd60.firebaseapp.com",
-  projectId: "conectatea-bbd60",
-  storageBucket: "conectatea-bbd60.firebasestorage.app",
-  messagingSenderId: "617006702777",
-  appId: "1:617006702777:web:7814d34b232520d2087b68"
+  projectId: "conectatea-bbd60"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
+let currentUser = null;
+
 // LOGIN
-document.getElementById("loginBtn").onclick = async () => {
+window.login = async function(tipo){
   const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth, provider);
-  alert("Login realizado com sucesso!");
-};
+  const result = await signInWithPopup(auth, provider);
+  currentUser = result.user;
+
+  await setDoc(doc(db, "usuarios", currentUser.uid), {
+    nome: currentUser.displayName,
+    tipo: tipo
+  });
+
+  if(tipo === "docente") abrirDocente();
+  else abrirAluno();
+}
 
 // DOCENTE
-document.getElementById("docenteBtn").onclick = () => {
-  document.getElementById("app").innerHTML = `
-    <div class="header"><h2>Área do Docente</h2></div>
-    <div class="content">
-      <div class="card">
-        <h3>📤 Poste sua aula</h3>
-        <input id="texto" placeholder="Digite sua aula...">
-        <button class="btn docente" id="postarBtn">Publicar</button>
-      </div>
+window.abrirDocente = function(){
+document.getElementById("app").innerHTML = `
+<div class="header"><h2>Área do Docente</h2></div>
+<div class="content">
 
-      <div class="card">
-        <h3>📚 Aulas publicadas</h3>
-        <div id="lista"></div>
-      </div>
+<div class="card">
+<h3>Criar Aula</h3>
+<input id="curso" placeholder="Curso">
+<input id="titulo" placeholder="Título">
+<textarea id="descricao" placeholder="Descrição simples"></textarea>
+<input id="p1" placeholder="Passo 1">
+<input id="p2" placeholder="Passo 2">
+<input id="p3" placeholder="Passo 3">
+<button class="btn docente" onclick="postar()">Publicar</button>
+</div>
 
-      <button class="btn" onclick="location.reload()">Voltar</button>
-    </div>
-  `;
+<div class="card">
+<h3>Aulas criadas</h3>
+<div id="lista"></div>
+</div>
 
-  document.getElementById("postarBtn").onclick = async () => {
-    let texto = document.getElementById("texto").value;
-    if(texto.trim() === "") return;
-    await addDoc(collection(db, "aulas"), { texto });
-    document.getElementById("texto").value = "";
-  };
+<button class="btn" onclick="location.reload()">Sair</button>
 
-  carregar();
-};
+</div>
+`;
+carregarDocente();
+}
+
+// POSTAR
+window.postar = async function(){
+await addDoc(collection(db,"aulas"),{
+  curso:curso.value,
+  titulo:titulo.value,
+  descricao:descricao.value,
+  passos:[p1.value,p2.value,p3.value],
+  docente:currentUser.uid
+});
+alert("Aula publicada");
+}
+
+// CARREGAR DOCENTE
+function carregarDocente(){
+onSnapshot(collection(db,"aulas"),snap=>{
+let html="";
+snap.forEach(doc=>{
+let a=doc.data();
+html+=`<div class="card"><b>${a.titulo}</b><br><span class="small">${a.curso}</span></div>`;
+});
+lista.innerHTML=html;
+});
+}
 
 // ALUNO
-document.getElementById("alunoBtn").onclick = () => {
-  document.getElementById("app").innerHTML = `
-    <div class="header"><h2>Área do Estudante</h2></div>
-    <div class="content">
-      <div class="card">
-        <h3>📖 Aulas disponíveis</h3>
-        <div id="lista"></div>
-      </div>
-      <button class="btn" onclick="location.reload()">Voltar</button>
-    </div>
-  `;
-  carregar();
-};
+window.abrirAluno = function(){
+document.getElementById("app").innerHTML = `
+<div class="header"><h2>Área do Estudante</h2></div>
+<div class="content">
 
-// CARREGAR AULAS
-function carregar(){
-  onSnapshot(collection(db, "aulas"), (snapshot)=>{
-    let html="";
-    snapshot.forEach(doc=>{
-      html += "<div class='card'>"+doc.data().texto+"</div>";
-    });
-    document.getElementById("lista").innerHTML = html;
-  });
+<select id="filtro" onchange="carregarAluno()">
+<option value="">Todos cursos</option>
+</select>
+
+<div id="lista"></div>
+
+<button class="btn" onclick="location.reload()">Sair</button>
+
+</div>
+`;
+carregarAluno();
+}
+
+// CARREGAR ALUNO
+function carregarAluno(){
+onSnapshot(collection(db,"aulas"),snap=>{
+let html="";
+let cursos=new Set();
+
+snap.forEach(doc=>{
+let a=doc.data();
+cursos.add(a.curso);
+
+html+=`
+<div class="card">
+<h3>${a.titulo}</h3>
+<p>${a.descricao}</p>
+
+${a.passos.map((p,i)=>`
+<div class="check" onclick="marcar(this)">
+✔ ${p}
+</div>`).join("")}
+
+<textarea placeholder="Feedback ao docente" onchange="enviarFeedback('${doc.id}',this.value)"></textarea>
+
+</div>
+`;
+});
+
+lista.innerHTML=html;
+
+// cursos
+filtro.innerHTML='<option value="">Todos cursos</option>';
+cursos.forEach(c=>{
+filtro.innerHTML+=`<option>${c}</option>`;
+});
+
+});
+}
+
+// CHECK
+window.marcar = function(el){
+el.classList.toggle("done");
+}
+
+// FEEDBACK
+window.enviarFeedback = async function(id,texto){
+await addDoc(collection(db,"feedback"),{
+ aula:id,
+ texto:texto,
+ aluno:currentUser.uid
+});
 }
 
 </script>
