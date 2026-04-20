@@ -1,199 +1,842 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ConectaTEA EPT</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConectaTEA EPT</title>
 
-<style>
-body{margin:0;font-family:'Segoe UI';background:#eef3f8}
-.app{max-width:420px;margin:auto;background:white;min-height:100vh}
-.header{background:linear-gradient(135deg,#5f9cff,#5fd4a3);color:white;padding:20px;border-radius:0 0 20px 20px}
-.content{padding:20px}
-.btn{width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;font-size:15px;cursor:pointer}
-.aluno{background:#5f9cff;color:white}
-.docente{background:#5fd4a3;color:white}
-.card{background:white;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
-input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin-bottom:8px}
-.check{cursor:pointer;padding:5px;border-radius:8px}
-.check.done{background:#d4f8e8;text-decoration:line-through}
-.small{font-size:13px;color:#555}
-</style>
+  <style>
+    :root{
+      --azul:#0f67b6;
+      --azul-2:#2f8de0;
+      --verde:#7cc6b7;
+      --verde-2:#cbe8dc;
+      --fundo:#eef4f8;
+      --texto:#21415f;
+      --sombra:0 8px 18px rgba(30, 65, 95, .12);
+      --raio:22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:#e9eef3;
+      color:var(--texto);
+    }
+
+    .phone{
+      width:100%;
+      max-width:430px;
+      min-height:100vh;
+      margin:0 auto;
+      background:linear-gradient(180deg,#f7fbfd 0%, #eef5f7 58%, #d8efe6 100%);
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 24px rgba(0,0,0,.08);
+    }
+
+    .wave{
+      position:absolute;
+      inset:auto -10% -5% -10%;
+      height:220px;
+      background:
+        radial-gradient(120% 100% at 0% 100%, rgba(34,114,190,.85) 0 32%, transparent 33%),
+        radial-gradient(120% 100% at 30% 100%, rgba(80,170,210,.42) 0 28%, transparent 29%),
+        radial-gradient(120% 100% at 75% 100%, rgba(103,191,150,.45) 0 26%, transparent 27%),
+        radial-gradient(120% 100% at 100% 100%, rgba(180,220,120,.45) 0 22%, transparent 23%);
+      pointer-events:none;
+    }
+
+    .screen{
+      position:relative;
+      z-index:1;
+      padding:22px 18px 28px;
+    }
+
+    .topbar{
+      background:linear-gradient(180deg,var(--azul),var(--azul-2));
+      color:#fff;
+      margin:-22px -18px 18px;
+      padding:20px 18px 16px;
+      border-bottom-left-radius:26px;
+      border-bottom-right-radius:26px;
+      box-shadow:var(--sombra);
+    }
+
+    .topbar-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .back-btn{
+      border:none;
+      background:transparent;
+      color:#fff;
+      font-size:24px;
+      cursor:pointer;
+      padding:0;
+      line-height:1;
+    }
+
+    .title{
+      font-size:1.9rem;
+      font-weight:800;
+      margin:0;
+      letter-spacing:.2px;
+    }
+
+    .subtitle{
+      font-size:1rem;
+      margin:8px 0 0;
+      opacity:.95;
+    }
+
+    .logo-wrap{
+      text-align:center;
+      padding-top:16px;
+      padding-bottom:10px;
+    }
+
+    .logo-head{
+      width:82px;
+      height:82px;
+      margin:0 auto 10px;
+      border-radius:50%;
+      background:linear-gradient(180deg,#1b76c9,#1e5b96);
+      position:relative;
+      box-shadow:var(--sombra);
+    }
+
+    .logo-head:before{
+      content:"";
+      position:absolute;
+      width:40px;
+      height:40px;
+      top:18px;
+      left:21px;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, #d7f6e1 0 20%, #86d3b2 21% 50%, #f1cc63 51% 70%, #7fc0ea 71% 100%);
+      opacity:.95;
+    }
+
+    .brand{
+      font-size:2rem;
+      font-weight:800;
+      color:#1d5b96;
+      margin:0;
+    }
+
+    .brand span{
+      color:#45a86d;
+    }
+
+    .brand-sub{
+      margin:6px 0 24px;
+      font-size:1rem;
+      color:#355a7a;
+    }
+
+    .choice-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:8px;
+    }
+
+    .choice-card{
+      background:linear-gradient(180deg,#eff6fb,#dbeef2);
+      border-radius:20px;
+      padding:18px 12px 14px;
+      box-shadow:var(--sombra);
+      border:1px solid rgba(255,255,255,.8);
+      cursor:pointer;
+      transition:transform .15s ease;
+      text-align:center;
+    }
+
+    .choice-card:nth-child(2){
+      background:linear-gradient(180deg,#eef6e8,#dceedd);
+    }
+
+    .choice-card:hover{ transform:translateY(-2px); }
+
+    .choice-ico{
+      width:86px;
+      height:86px;
+      margin:0 auto 14px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:40px;
+      background:#ffffffcc;
+      box-shadow:inset 0 0 0 1px rgba(25,75,120,.08);
+    }
+
+    .choice-btn{
+      display:block;
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:12px;
+      font-weight:700;
+      font-size:1.05rem;
+      color:#fff;
+      cursor:pointer;
+    }
+
+    .btn-estudante{ background:#1674c5; }
+    .btn-docente{ background:#5d9d8a; }
+
+    .panel{
+      background:#fff;
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--sombra);
+      margin-bottom:14px;
+    }
+
+    .panel h3{
+      margin:0 0 14px;
+      font-size:1.2rem;
+      color:#21567f;
+      border-bottom:3px solid rgba(33,86,127,.25);
+      display:inline-block;
+      padding-bottom:4px;
+    }
+
+    .routine-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-top:2px;
+    }
+
+    .routine-item{
+      text-align:center;
+    }
+
+    .routine-icon{
+      width:64px;
+      height:64px;
+      margin:0 auto 7px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      background:#dceef4;
+    }
+
+    .routine-item:nth-child(2) .routine-icon{ background:#f4e7ad; }
+    .routine-item:nth-child(3) .routine-icon{ background:#cbe8dc; }
+    .routine-item:nth-child(4) .routine-icon{ background:#efd6c6; }
+
+    .pill{
+      border-radius:10px;
+      color:#fff;
+      padding:7px 6px;
+      font-size:.92rem;
+      font-weight:700;
+    }
+
+    .pill.aula{ background:#4ab08f; }
+    .pill.intervalo{ background:#2a5f98; }
+    .pill.estudo{ background:#f3a532; }
+    .pill.pausa{ background:#d96e45; }
+
+    .materials-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .material-card{
+      border-radius:18px;
+      overflow:hidden;
+      background:linear-gradient(180deg,#d5ebf2,#c5e4dc);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);
+    }
+
+    .material-top{
+      height:108px;
+      display:grid;
+      place-items:center;
+      font-size:54px;
+      background:rgba(255,255,255,.12);
+    }
+
+    .material-bottom{
+      color:#fff;
+      font-weight:700;
+      text-align:center;
+      padding:10px 8px;
+      font-size:1rem;
+    }
+
+    .material-bottom.azul{ background:#2f7fc1; }
+    .material-bottom.verde{ background:#7aaea4; }
+
+    .teacher-card{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      background:#fff;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:var(--sombra);
+      margin-bottom:14px;
+    }
+
+    .teacher-icon{
+      width:62px;
+      height:62px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      color:#fff;
+      flex:0 0 auto;
+    }
+
+    .teacher-icon.azul{ background:#3e90c8; }
+    .teacher-icon.verde{ background:#8ab95a; }
+    .teacher-icon.escuro{ background:#2f78a2; }
+
+    .teacher-title{
+      margin:0 0 4px;
+      font-size:1.1rem;
+      font-weight:800;
+      color:#214d73;
+    }
+
+    .teacher-desc{
+      margin:0;
+      color:#4f6b83;
+      line-height:1.35;
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .toolbar button{
+      flex:1;
+      min-width:120px;
+      border:none;
+      border-radius:12px;
+      padding:12px;
+      cursor:pointer;
+      font-weight:700;
+      color:#fff;
+      background:#2f7fc1;
+    }
+
+    .toolbar .secondary{
+      background:#6aa999;
+    }
+
+    .toolbar .danger{
+      background:#8a9db1;
+    }
+
+    .form-group{
+      margin-bottom:10px;
+    }
+
+    .label{
+      display:block;
+      margin:0 0 6px;
+      font-size:.95rem;
+      font-weight:700;
+      color:#2a567d;
+    }
+
+    input, textarea, select{
+      width:100%;
+      border:1px solid #d0dde7;
+      border-radius:12px;
+      padding:12px 13px;
+      font:inherit;
+      background:#fbfdff;
+      color:#244661;
+    }
+
+    textarea{
+      min-height:88px;
+      resize:vertical;
+    }
+
+    .primary-btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      font-weight:800;
+      font-size:1rem;
+      color:#fff;
+      background:linear-gradient(180deg,#2f8de0,#0f67b6);
+      cursor:pointer;
+    }
+
+    .lesson-card{
+      background:#fff;
+      border-radius:18px;
+      padding:14px;
+      box-shadow:var(--sombra);
+      margin-bottom:12px;
+      border-left:6px solid #75b89d;
+    }
+
+    .lesson-title{
+      margin:0 0 6px;
+      font-size:1.08rem;
+      font-weight:800;
+      color:#214d73;
+    }
+
+    .lesson-meta{
+      margin:0 0 10px;
+      font-size:.86rem;
+      color:#67819a;
+    }
+
+    .lesson-desc{
+      margin:0 0 10px;
+      line-height:1.45;
+      color:#3d5f79;
+    }
+
+    .steps{
+      margin:0;
+      padding-left:18px;
+      color:#355b78;
+    }
+
+    .steps li{
+      margin-bottom:6px;
+    }
+
+    .empty{
+      text-align:center;
+      color:#6d879d;
+      padding:20px 10px;
+    }
+
+    .user-badge{
+      margin-top:10px;
+      font-size:.92rem;
+      color:#eaf5ff;
+    }
+
+    .footer-space{ height:16px; }
+
+    @media (max-width:390px){
+      .routine-grid{ grid-template-columns:repeat(2,1fr); }
+      .materials-grid{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="phone">
+    <div class="wave"></div>
+    <div id="app"></div>
+  </div>
 
-<div class="app" id="app">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      onSnapshot,
+      setDoc,
+      doc,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<div class="header">
-<h2>ConectaTEA</h2>
-<p>Aprendizagem inclusiva e estruturada</p>
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvbVGsUKt-gTNiD6l2Bo6z2pbkxAcl9zc",
+      authDomain: "conectatea-bbd60.firebaseapp.com",
+      projectId: "conectatea-bbd60",
+      storageBucket: "conectatea-bbd60.firebasestorage.app",
+      messagingSenderId: "617006702777",
+      appId: "1:617006702777:web:7814d34b232520d2087b68"
+    };
 
-<div class="content">
-<button class="btn aluno" onclick="login('aluno')">👩‍🎓 Estudante</button>
-<button class="btn docente" onclick="login('docente')">👨‍🏫 Docente</button>
-</div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-</div>
+    const appEl = document.getElementById("app");
 
-<script type="module">
+    let currentUser = null;
+    let currentRole = null;
+    let unsubscribeLessons = null;
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    function destroyListeners() {
+      if (unsubscribeLessons) {
+        unsubscribeLessons();
+        unsubscribeLessons = null;
+      }
+    }
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDvbVGsUKt-gTNiD6l2Bo6z2pbkxAcl9zc",
-  authDomain: "conectatea-bbd60.firebaseapp.com",
-  projectId: "conectatea-bbd60"
-};
+    function renderHome() {
+      destroyListeners();
+      appEl.innerHTML = `
+        <div class="screen">
+          <div class="logo-wrap">
+            <div class="logo-head"></div>
+            <h1 class="brand">Conecta<span>TEA</span> EPT</h1>
+            <p class="brand-sub">Inclusão para Alunos e Professores</p>
+          </div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+          <div class="choice-grid">
+            <div class="choice-card" id="card-aluno">
+              <div class="choice-ico">📖</div>
+              <button class="choice-btn btn-estudante">Sou Estudante</button>
+            </div>
 
-let currentUser = null;
+            <div class="choice-card" id="card-docente">
+              <div class="choice-ico">📝</div>
+              <button class="choice-btn btn-docente">Sou Professor</button>
+            </div>
+          </div>
+        </div>
+      `;
 
-// LOGIN
-window.login = async function(tipo){
-  const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-  currentUser = result.user;
+      document.getElementById("card-aluno").addEventListener("click", () => loginWithRole("aluno"));
+      document.getElementById("card-docente").addEventListener("click", () => loginWithRole("docente"));
+    }
 
-  await setDoc(doc(db, "usuarios", currentUser.uid), {
-    nome: currentUser.displayName,
-    tipo: tipo
-  });
+    function renderStudentScreen() {
+      destroyListeners();
 
-  if(tipo === "docente") abrirDocente();
-  else abrirAluno();
-}
+      appEl.innerHTML = `
+        <div class="screen">
+          <div class="topbar">
+            <div class="topbar-row">
+              <button class="back-btn" id="btn-home">←</button>
+              <div>
+                <h2 class="title" style="font-size:1.65rem;">Área do Estudante</h2>
+                <div class="user-badge">${currentUser ? currentUser.displayName : ""}</div>
+              </div>
+            </div>
+          </div>
 
-// DOCENTE
-window.abrirDocente = function(){
-document.getElementById("app").innerHTML = `
-<div class="header"><h2>Área do Docente</h2></div>
-<div class="content">
+          <div class="panel">
+            <h3>Minha Rotina Visual</h3>
+            <div class="routine-grid">
+              <div class="routine-item">
+                <div class="routine-icon">🖥️</div>
+                <div class="pill aula">Aula</div>
+              </div>
+              <div class="routine-item">
+                <div class="routine-icon">⏰</div>
+                <div class="pill intervalo">Intervalo</div>
+              </div>
+              <div class="routine-item">
+                <div class="routine-icon">📚</div>
+                <div class="pill estudo">Estudo</div>
+              </div>
+              <div class="routine-item">
+                <div class="routine-icon">☕</div>
+                <div class="pill pausa">Pausa</div>
+              </div>
+            </div>
+          </div>
 
-<div class="card">
-<h3>Criar Aula</h3>
-<input id="curso" placeholder="Curso">
-<input id="titulo" placeholder="Título">
-<textarea id="descricao" placeholder="Descrição simples"></textarea>
-<input id="p1" placeholder="Passo 1">
-<input id="p2" placeholder="Passo 2">
-<input id="p3" placeholder="Passo 3">
-<button class="btn docente" onclick="postar()">Publicar</button>
-</div>
+          <div class="panel">
+            <h3>Materiais Adaptados</h3>
+            <div class="materials-grid">
+              <div class="material-card">
+                <div class="material-top">📖</div>
+                <div class="material-bottom azul">Texto Simplificado</div>
+              </div>
+              <div class="material-card">
+                <div class="material-top">💻</div>
+                <div class="material-bottom verde">Vídeos Educativos</div>
+              </div>
+            </div>
+          </div>
 
-<div class="card">
-<h3>Aulas criadas</h3>
-<div id="lista"></div>
-</div>
+          <div class="panel">
+            <h3>Aulas do Professor</h3>
+            <div id="student-lessons">
+              <div class="empty">Carregando aulas...</div>
+            </div>
+          </div>
 
-<button class="btn" onclick="location.reload()">Sair</button>
+          <div class="toolbar">
+            <button class="secondary" id="btn-logout-student">Sair</button>
+          </div>
 
-</div>
-`;
-carregarDocente();
-}
+          <div class="footer-space"></div>
+        </div>
+      `;
 
-// POSTAR
-window.postar = async function(){
-await addDoc(collection(db,"aulas"),{
-  curso:curso.value,
-  titulo:titulo.value,
-  descricao:descricao.value,
-  passos:[p1.value,p2.value,p3.value],
-  docente:currentUser.uid
-});
-alert("Aula publicada");
-}
+      document.getElementById("btn-home").addEventListener("click", renderHome);
+      document.getElementById("btn-logout-student").addEventListener("click", doLogout);
 
-// CARREGAR DOCENTE
-function carregarDocente(){
-onSnapshot(collection(db,"aulas"),snap=>{
-let html="";
-snap.forEach(doc=>{
-let a=doc.data();
-html+=`<div class="card"><b>${a.titulo}</b><br><span class="small">${a.curso}</span></div>`;
-});
-lista.innerHTML=html;
-});
-}
+      const lessonsEl = document.getElementById("student-lessons");
+      const lessonsQuery = query(collection(db, "aulas"), orderBy("createdAt", "desc"));
 
-// ALUNO
-window.abrirAluno = function(){
-document.getElementById("app").innerHTML = `
-<div class="header"><h2>Área do Estudante</h2></div>
-<div class="content">
+      unsubscribeLessons = onSnapshot(lessonsQuery, (snapshot) => {
+        if (snapshot.empty) {
+          lessonsEl.innerHTML = `<div class="empty">Nenhuma aula publicada ainda.</div>`;
+          return;
+        }
 
-<select id="filtro" onchange="carregarAluno()">
-<option value="">Todos cursos</option>
-</select>
+        lessonsEl.innerHTML = "";
+        snapshot.forEach((item) => {
+          const aula = item.data();
+          const steps = Array.isArray(aula.passos) ? aula.passos.filter(Boolean) : [];
 
-<div id="lista"></div>
+          const card = document.createElement("div");
+          card.className = "lesson-card";
+          card.innerHTML = `
+            <h4 class="lesson-title">${escapeHtml(aula.titulo || "Aula sem título")}</h4>
+            <p class="lesson-meta">${escapeHtml(aula.curso || "Curso não informado")} • ${escapeHtml(aula.disciplina || "Disciplina não informada")}</p>
+            <p class="lesson-desc">${escapeHtml(aula.descricao || "")}</p>
+            ${steps.length ? `<ol class="steps">${steps.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ol>` : ""}
+          `;
+          lessonsEl.appendChild(card);
+        });
+      });
+    }
 
-<button class="btn" onclick="location.reload()">Sair</button>
+    function renderTeacherScreen() {
+      destroyListeners();
 
-</div>
-`;
-carregarAluno();
-}
+      appEl.innerHTML = `
+        <div class="screen">
+          <div class="topbar">
+            <div class="topbar-row">
+              <button class="back-btn" id="btn-home">←</button>
+              <div>
+                <h2 class="title" style="font-size:1.65rem;">Área do Professor</h2>
+                <div class="user-badge">${currentUser ? currentUser.displayName : ""}</div>
+              </div>
+            </div>
+          </div>
 
-// CARREGAR ALUNO
-function carregarAluno(){
-onSnapshot(collection(db,"aulas"),snap=>{
-let html="";
-let cursos=new Set();
+          <div class="teacher-card">
+            <div class="teacher-icon azul">🧠</div>
+            <div>
+              <h3 class="teacher-title">Guia sobre o TEA</h3>
+              <p class="teacher-desc">Saiba mais sobre o autismo</p>
+            </div>
+          </div>
 
-snap.forEach(doc=>{
-let a=doc.data();
-cursos.add(a.curso);
+          <div class="teacher-card">
+            <div class="teacher-icon verde">📋</div>
+            <div>
+              <h3 class="teacher-title">Estratégias Inclusivas</h3>
+              <p class="teacher-desc">Dicas e práticas adaptadas</p>
+            </div>
+          </div>
 
-html+=`
-<div class="card">
-<h3>${a.titulo}</h3>
-<p>${a.descricao}</p>
+          <div class="teacher-card">
+            <div class="teacher-icon escuro">✅</div>
+            <div>
+              <h3 class="teacher-title">Checklist Acessível</h3>
+              <p class="teacher-desc">Planeje sua aula inclusiva</p>
+            </div>
+          </div>
 
-${a.passos.map((p,i)=>`
-<div class="check" onclick="marcar(this)">
-✔ ${p}
-</div>`).join("")}
+          <div class="panel">
+            <h3>Poste sua aula aqui</h3>
 
-<textarea placeholder="Feedback ao docente" onchange="enviarFeedback('${doc.id}',this.value)"></textarea>
+            <div class="form-group">
+              <label class="label">Curso</label>
+              <input id="curso" placeholder="Ex.: Informática" />
+            </div>
 
-</div>
-`;
-});
+            <div class="form-group">
+              <label class="label">Disciplina</label>
+              <input id="disciplina" placeholder="Ex.: Lógica de Programação" />
+            </div>
 
-lista.innerHTML=html;
+            <div class="form-group">
+              <label class="label">Título da aula</label>
+              <input id="titulo" placeholder="Ex.: Introdução aos algoritmos" />
+            </div>
 
-// cursos
-filtro.innerHTML='<option value="">Todos cursos</option>';
-cursos.forEach(c=>{
-filtro.innerHTML+=`<option>${c}</option>`;
-});
+            <div class="form-group">
+              <label class="label">Descrição simples</label>
+              <textarea id="descricao" placeholder="Explique de forma clara, curta e objetiva."></textarea>
+            </div>
 
-});
-}
+            <div class="form-group">
+              <label class="label">Passo 1</label>
+              <input id="passo1" placeholder="Ex.: Assistir ao vídeo introdutório" />
+            </div>
 
-// CHECK
-window.marcar = function(el){
-el.classList.toggle("done");
-}
+            <div class="form-group">
+              <label class="label">Passo 2</label>
+              <input id="passo2" placeholder="Ex.: Ler o resumo da aula" />
+            </div>
 
-// FEEDBACK
-window.enviarFeedback = async function(id,texto){
-await addDoc(collection(db,"feedback"),{
- aula:id,
- texto:texto,
- aluno:currentUser.uid
-});
-}
+            <div class="form-group">
+              <label class="label">Passo 3</label>
+              <input id="passo3" placeholder="Ex.: Resolver a atividade guiada" />
+            </div>
 
-</script>
+            <button class="primary-btn" id="btn-publicar">Publicar Aula</button>
+          </div>
 
+          <div class="panel">
+            <h3>Aulas Publicadas</h3>
+            <div id="teacher-lessons">
+              <div class="empty">Carregando aulas...</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button class="secondary" id="btn-logout-teacher">Sair</button>
+          </div>
+
+          <div class="footer-space"></div>
+        </div>
+      `;
+
+      document.getElementById("btn-home").addEventListener("click", renderHome);
+      document.getElementById("btn-logout-teacher").addEventListener("click", doLogout);
+      document.getElementById("btn-publicar").addEventListener("click", publishLesson);
+
+      const lessonsEl = document.getElementById("teacher-lessons");
+      const lessonsQuery = query(collection(db, "aulas"), orderBy("createdAt", "desc"));
+
+      unsubscribeLessons = onSnapshot(lessonsQuery, (snapshot) => {
+        if (snapshot.empty) {
+          lessonsEl.innerHTML = `<div class="empty">Nenhuma aula publicada ainda.</div>`;
+          return;
+        }
+
+        lessonsEl.innerHTML = "";
+        snapshot.forEach((item) => {
+          const aula = item.data();
+          const card = document.createElement("div");
+          card.className = "lesson-card";
+          card.innerHTML = `
+            <h4 class="lesson-title">${escapeHtml(aula.titulo || "Aula sem título")}</h4>
+            <p class="lesson-meta">${escapeHtml(aula.curso || "Curso não informado")} • ${escapeHtml(aula.disciplina || "Disciplina não informada")}</p>
+            <p class="lesson-desc">${escapeHtml(aula.descricao || "")}</p>
+          `;
+          lessonsEl.appendChild(card);
+        });
+      });
+    }
+
+    async function publishLesson() {
+      const curso = document.getElementById("curso").value.trim();
+      const disciplina = document.getElementById("disciplina").value.trim();
+      const titulo = document.getElementById("titulo").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
+      const passo1 = document.getElementById("passo1").value.trim();
+      const passo2 = document.getElementById("passo2").value.trim();
+      const passo3 = document.getElementById("passo3").value.trim();
+
+      if (!curso || !disciplina || !titulo || !descricao) {
+        alert("Preencha curso, disciplina, título e descrição.");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "aulas"), {
+          curso,
+          disciplina,
+          titulo,
+          descricao,
+          passos: [passo1, passo2, passo3].filter(Boolean),
+          docenteNome: currentUser?.displayName || "",
+          docenteEmail: currentUser?.email || "",
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("curso").value = "";
+        document.getElementById("disciplina").value = "";
+        document.getElementById("titulo").value = "";
+        document.getElementById("descricao").value = "";
+        document.getElementById("passo1").value = "";
+        document.getElementById("passo2").value = "";
+        document.getElementById("passo3").value = "";
+
+        alert("Aula publicada com sucesso.");
+      } catch (error) {
+        console.error(error);
+        alert("Erro ao publicar aula: " + error.message);
+      }
+    }
+
+    async function loginWithRole(role) {
+      try {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+
+        const result = await signInWithPopup(auth, provider);
+        currentUser = result.user;
+        currentRole = role;
+
+        await setDoc(doc(db, "usuarios", currentUser.uid), {
+          nome: currentUser.displayName || "",
+          email: currentUser.email || "",
+          tipo: role,
+          atualizadoEm: new Date().toISOString()
+        }, { merge: true });
+
+        if (role === "docente") {
+          renderTeacherScreen();
+        } else {
+          renderStudentScreen();
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Erro no login: " + error.message);
+      }
+    }
+
+    async function doLogout() {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error(error);
+      }
+      currentUser = null;
+      currentRole = null;
+      renderHome();
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user || null;
+      if (!user) {
+        currentRole = null;
+      }
+    });
+
+    renderHome();
+  </script>
 </body>
 </html>
