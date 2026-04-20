@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>ConectaTEA</title>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 </head>
 
 <body>
@@ -13,29 +10,37 @@
 <h2>ConectaTEA</h2>
 
 <button onclick="login()">Login com Google</button>
+<button onclick="docente()">Sou Docente</button>
+<button onclick="aluno()">Sou Aluno</button>
 
 <div id="app"></div>
 
-<script>
-// CONFIG FIREBASE (VOCÊ VAI TROCAR DEPOIS)
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔥 COLE SUA CONFIG AQUI
 const firebaseConfig = {
-  apiKey: "SUA_CHAVE",
-  authDomain: "SEU_APP.firebaseapp.com",
-  projectId: "SEU_APP"
+  apiKey: "COLE_AQUI",
+  authDomain: "conectatea-bbd60.firebaseapp.com",
+  projectId: "conectatea-bbd60"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
 
 // LOGIN
-function login(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+window.login = async function(){
+  const provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
+  alert("Login realizado!");
 }
 
-// ÁREA DOCENTE
-function docente(){
+// DOCENTE
+window.docente = function(){
 document.getElementById("app").innerHTML = `
 <h3>Poste sua aula</h3>
 <input id="aula">
@@ -46,14 +51,23 @@ carregar();
 }
 
 // POSTAR
-function postar(){
+window.postar = async function(){
 let texto = document.getElementById("aula").value;
-db.collection("aulas").add({texto: texto});
+await addDoc(collection(db, "aulas"), {texto});
+}
+
+// ALUNO
+window.aluno = function(){
+document.getElementById("app").innerHTML = `
+<h3>Aulas disponíveis</h3>
+<div id="lista"></div>
+`;
+carregar();
 }
 
 // CARREGAR
-function carregar(){
-db.collection("aulas").onSnapshot(snapshot=>{
+window.carregar = function(){
+onSnapshot(collection(db, "aulas"), (snapshot)=>{
 let html="";
 snapshot.forEach(doc=>{
 html += "<p>"+doc.data().texto+"</p>";
@@ -62,19 +76,7 @@ document.getElementById("lista").innerHTML = html;
 });
 }
 
-// ÁREA ALUNO
-function aluno(){
-document.getElementById("app").innerHTML = `
-<h3>Aulas disponíveis</h3>
-<div id="lista"></div>
-`;
-carregar();
-}
-
 </script>
-
-<button onclick="aluno()">Aluno</button>
-<button onclick="docente()">Docente</button>
 
 </body>
 </html>
