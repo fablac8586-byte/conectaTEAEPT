@@ -1,143 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IncluiTEA EPT</title>
-
-<style>
-body {
-  margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg, #2F80ED, #6FCF97);
-  color:#333;
-}
-
-.container {
-  max-width: 400px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
-}
-
-.card {
-  background: white;
-  border-radius: 20px;
-  padding: 15px;
-  margin: 10px 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.btn {
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:15px;
-  font-size:16px;
-  margin:10px 0;
-  cursor:pointer;
-}
-
-.aluno { background:#56CCF2; color:white;}
-.docente { background:#27AE60; color:white;}
-
-.topo {
-  color:white;
-  margin-bottom:20px;
-}
-
-h2 { margin:5px; }
-
-.lista {
-  text-align:left;
-}
-
-.item {
-  background:#f2f2f2;
-  padding:10px;
-  border-radius:10px;
-  margin:5px 0;
-}
-
-</style>
+<title>ConectaTEA</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 </head>
 
 <body>
 
-<div class="container" id="app">
+<h2>ConectaTEA</h2>
 
-  <div class="topo">
-    <h2>IncluiTEA EPT</h2>
-    <p>Inclusão para alunos e professores</p>
-  </div>
+<button onclick="login()">Login com Google</button>
 
-  <div class="card">
-    <button class="btn aluno" onclick="aluno()">Sou Estudante</button>
-    <button class="btn docente" onclick="docente()">Sou Professor</button>
-  </div>
-
-</div>
+<div id="app"></div>
 
 <script>
+// CONFIG FIREBASE (VOCÊ VAI TROCAR DEPOIS)
+const firebaseConfig = {
+  apiKey: "SUA_CHAVE",
+  authDomain: "SEU_APP.firebaseapp.com",
+  projectId: "SEU_APP"
+};
 
-function aluno(){
-document.getElementById("app").innerHTML = `
-<div class="container">
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-<h2 style="color:white">Área do Estudante</h2>
-
-<div class="card">
-<h3>Minha Rotina</h3>
-<div class="item">🎓 Aula</div>
-<div class="item">⏰ Intervalo</div>
-<div class="item">📚 Estudo</div>
-<div class="item">☕ Pausa</div>
-</div>
-
-<div class="card">
-<h3>Materiais Adaptados</h3>
-<div class="item">📖 Texto Simplificado</div>
-<div class="item">🎥 Vídeos Educativos</div>
-</div>
-
-<button class="btn" onclick="voltar()">Voltar</button>
-
-</div>
-`;
+// LOGIN
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
 }
 
+// ÁREA DOCENTE
 function docente(){
 document.getElementById("app").innerHTML = `
-<div class="container">
-
-<h2 style="color:white">Área do Professor</h2>
-
-<div class="card">
-<h3>Guia sobre TEA</h3>
-<p>Saiba mais sobre o autismo</p>
-</div>
-
-<div class="card">
-<h3>Estratégias Inclusivas</h3>
-<p>Dicas e práticas adaptadas</p>
-</div>
-
-<div class="card">
-<h3>Checklist Acessível</h3>
-<p>Planeje sua aula inclusiva</p>
-</div>
-
-<button class="btn" onclick="voltar()">Voltar</button>
-
-</div>
+<h3>Poste sua aula</h3>
+<input id="aula">
+<button onclick="postar()">Postar</button>
+<div id="lista"></div>
 `;
+carregar();
 }
 
-function voltar(){
-location.reload();
+// POSTAR
+function postar(){
+let texto = document.getElementById("aula").value;
+db.collection("aulas").add({texto: texto});
+}
+
+// CARREGAR
+function carregar(){
+db.collection("aulas").onSnapshot(snapshot=>{
+let html="";
+snapshot.forEach(doc=>{
+html += "<p>"+doc.data().texto+"</p>";
+});
+document.getElementById("lista").innerHTML = html;
+});
+}
+
+// ÁREA ALUNO
+function aluno(){
+document.getElementById("app").innerHTML = `
+<h3>Aulas disponíveis</h3>
+<div id="lista"></div>
+`;
+carregar();
 }
 
 </script>
+
+<button onclick="aluno()">Aluno</button>
+<button onclick="docente()">Docente</button>
 
 </body>
 </html>
