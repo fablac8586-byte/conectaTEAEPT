@@ -1,0 +1,8 @@
+{
+  "name": "IncluiTEA",
+  "short_name": "IncluiTEA",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2F80ED"
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IncluiTEA EPT</title>
+
+<style>
+body {
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #2F80ED, #6FCF97);
+  color:#333;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn {
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:15px;
+  font-size:16px;
+  margin:10px 0;
+  cursor:pointer;
+}
+
+.aluno { background:#56CCF2; color:white;}
+.docente { background:#27AE60; color:white;}
+
+.topo {
+  color:white;
+  margin-bottom:20px;
+}
+
+h2 { margin:5px; }
+
+.lista {
+  text-align:left;
+}
+
+.item {
+  background:#f2f2f2;
+  padding:10px;
+  border-radius:10px;
+  margin:5px 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app">
+
+  <div class="topo">
+    <h2>IncluiTEA EPT</h2>
+    <p>Inclusão para alunos e professores</p>
+  </div>
+
+  <div class="card">
+    <button class="btn aluno" onclick="aluno()">Sou Estudante</button>
+    <button class="btn docente" onclick="docente()">Sou Professor</button>
+  </div>
+
+</div>
+
+<script>
+
+function aluno(){
+document.getElementById("app").innerHTML = `
+<div class="container">
+
+<h2 style="color:white">Área do Estudante</h2>
+
+<div class="card">
+<h3>Minha Rotina</h3>
+<div class="item">🎓 Aula</div>
+<div class="item">⏰ Intervalo</div>
+<div class="item">📚 Estudo</div>
+<div class="item">☕ Pausa</div>
+</div>
+
+<div class="card">
+<h3>Materiais Adaptados</h3>
+<div class="item">📖 Texto Simplificado</div>
+<div class="item">🎥 Vídeos Educativos</div>
+</div>
+
+<button class="btn" onclick="voltar()">Voltar</button>
+
+</div>
+`;
+}
+
+function docente(){
+document.getElementById("app").innerHTML = `
+<div class="container">
+
+<h2 style="color:white">Área do Professor</h2>
+
+<div class="card">
+<h3>Guia sobre TEA</h3>
+<p>Saiba mais sobre o autismo</p>
+</div>
+
+<div class="card">
+<h3>Estratégias Inclusivas</h3>
+<p>Dicas e práticas adaptadas</p>
+</div>
+
+<div class="card">
+<h3>Checklist Acessível</h3>
+<p>Planeje sua aula inclusiva</p>
+</div>
+
+<button class="btn" onclick="voltar()">Voltar</button>
+
+</div>
+`;
+}
+
+function voltar(){
+location.reload();
+}
+
+</script>
+
+</body>
+</html>
